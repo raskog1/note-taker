@@ -15,27 +15,16 @@ app.use(express.static("public"));
 // Create array to store our notes
 const notes = [];
 
+app.get("/", function (req, res) {
+  res.sendFile(path.join(__dirname, "./public/index.html"));
+});
+
 app.get("/notes", function (req, res) {
-  res.sendFile(path.join(__dirname, "public/notes.html"));
+  res.sendFile(path.join(__dirname, "./public/notes.html"));
 });
 
-// Displaying array by reading "db.json" file
 app.get("/api/notes", function (req, res) {
-  fs.readFile("./db/db.json", "utf8", function (err, data) {
-    if (err) throw err;
-    const results = JSON.parse(data);
-    return res.json(results);
-  });
-});
-
-// Displaying object by pulling from notes array
-app.get("/api/notes/:id", function (req, res) {
-  const chosen = notes.find((c) => c.id === parseInt(req.params.id));
-  return res.json(chosen);
-});
-
-app.get("*", function (req, res) {
-  res.sendFile(path.join(__dirname, "public/index.html"));
+  res.sendFile(path.join(__dirname, "./db/db.json"));
 });
 
 app.post("/api/notes", function (req, res) {
@@ -52,7 +41,14 @@ app.post("/api/notes", function (req, res) {
     if (err) throw err;
   });
   // Return results to the client
-  res.json(notes);
+  return res.json(notes);
+});
+
+// Displaying object by pulling from notes array
+app.get("/api/notes/:id", function (req, res) {
+  const chosen = notes.find((c) => c.id === parseInt(req.params.id));
+  console.log("api/notes/id FIRING!");
+  return res.json(chosen);
 });
 
 app.delete("/api/notes/:id", function (req, res) {
@@ -71,6 +67,11 @@ app.delete("/api/notes/:id", function (req, res) {
   });
   // Repopulate webpage
   res.json(notes);
+});
+
+app.get("*", function (req, res) {
+  console.log("Catch all is FIRING!");
+  res.sendFile(path.join(__dirname, "public/index.html"));
 });
 
 app.listen(PORT, function () {
